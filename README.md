@@ -147,12 +147,18 @@ And lastly, mathematically checking for a specific version:
 #endif
 ```
 
-# TODO
-* Describe why not used NDimension array libs like: 
+# Assumptions
+## We don't use any NDimension array lib
+We haven't used any NDimension array C++ lib like: 
   * https://www.cs.cornell.edu/~saeed/lite/html/group__array.html 
   * or Eigen: https://eigen.tuxfamily.org/index.php?title=Main_Page
   * or https://ndarray.github.io/ndarray/ndarrayTutorial.html
-* Assumed array layout in memory: https://eli.thegreenplace.net/2015/memory-layout-of-multi-dimensional-arrays
+
+The reason why is that HyperSpace Navigator wants to show how to map a N-Dimension space Domain language in its code.  
+
+## Space representation
+We assume that the N-Dimensional space can be flat represented, like: 
+  * Assumed array layout in memory: https://eli.thegreenplace.net/2015/memory-layout-of-multi-dimensional-arrays
 
 # Contributing and License
 
