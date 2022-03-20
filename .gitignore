@@ -1,0 +1,10 @@
+.DS_Store
+mason_packages
+cmake-build
+cmake-build-debug
+*.profdata
+*.profraw
+.toolchain
+.mason
+local.env
+.idea
