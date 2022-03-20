@@ -6,7 +6,12 @@
 #include <queue>
 #include <list>
 
+//TODO:
+// * Documentation
+
 namespace hyperspace_navigator {
+
+using SpaceIndex = std::vector<uint64_t>;
 
 class SpaceLayout {
     std::vector<uint64_t> _dimensionSizes;
@@ -14,11 +19,11 @@ class SpaceLayout {
   private:
     SpaceLayout() {
     }
-    
+
   public:
     SpaceLayout(const std::vector<uint64_t>& dimensionSizes) : _dimensionSizes(dimensionSizes) {
     }
-    
+
     uint64_t numDimensions() const {
         return _dimensionSizes.size();
     }
@@ -53,21 +58,21 @@ class SpaceLayout {
         std::for_each(_dimensionSizes.begin(), _dimensionSizes.end(), [&](uint64_t dim) {size*= dim;});
         return size;
     }
-    
+
     static SpaceLayout undefined() {
-        return {}; 
+        return {};
     }
-    
+
     bool isUndefined() {
         return _dimensionSizes.empty();
     }
-    
-    
+
+
 };
 
 class SpaceCell {
   private:
-    std::vector<uint64_t> _index;
+    SpaceIndex _index;
     SpaceLayout _layout;
 
     explicit SpaceCell() : _layout(SpaceLayout::undefined()) {
@@ -75,12 +80,12 @@ class SpaceCell {
 
 
   public:
-    SpaceCell(std::vector<uint64_t> index, const SpaceLayout& layout) : _index(index), _layout(layout) {
+    SpaceCell(SpaceIndex index, const SpaceLayout& layout) : _index(index), _layout(layout) {
     }
 
     SpaceCell(uint64_t spaceOffset,  SpaceLayout& layout) : _layout(layout) {
         uint64_t currDimension = layout.numDimensions() -1;
-        _index = std::vector<uint64_t>(layout.numDimensions(), 0);
+        _index = SpaceIndex(layout.numDimensions(), 0);
         while (currDimension > 0) {
             uint64_t subDimSize = layout.subDimensionLayoutSize(currDimension);
             _index[currDimension] = spaceOffset / subDimSize;
@@ -94,7 +99,7 @@ class SpaceCell {
     uint64_t spaceOffset() const {
         uint64_t res = 0;
         uint64_t currentDimension = 0;
-        std::vector<uint64_t>::const_iterator it;
+        SpaceIndex::const_iterator it;
         for (it = _index.begin(); it < _index.end(); ++it){
             res += *it * _layout.dimensionOffset(currentDimension++);
         }
@@ -109,7 +114,7 @@ class SpaceCell {
         std::vector<SpaceCell> cellsList;
         //Hamming distance of 1
         for (uint64_t i = 0; i < _layout.numDimensions(); i++) {
-            std::vector<uint64_t> cellIndex = _index;
+            SpaceIndex cellIndex = _index;
             if (cellIndex[i] < _layout.dimensionSize(i) -1)
             {
                 cellIndex[i] = cellIndex[i] + 1;
@@ -126,11 +131,11 @@ class SpaceCell {
     uint64_t numDimensions() const {
         return _layout.numDimensions();
     }
-    
+
     static SpaceCell undefined() {
         return SpaceCell();
     }
-    
+
     bool isUndefined() {
         return _layout.isUndefined();
     }
@@ -138,12 +143,16 @@ class SpaceCell {
     bool isDefined() {
         return !isUndefined();
     }
+
+    SpaceIndex index() {
+        return _index;
+    }
 };
 
 
 class NavigationPath {
     std::list<SpaceCell> _cells;
-    
+
   public:
     void add(const SpaceCell& cell) {
         _cells.push_front(cell);
@@ -153,10 +162,18 @@ class NavigationPath {
         return std::vector<SpaceCell>(_cells.begin(), _cells.end());
     }
 
+    std::vector<SpaceIndex> indexes() const{
+        std::vector<SpaceIndex> res;
+        for (SpaceCell cell: cells()) {
+            res.push_back(cell.index());
+        }
+        return res;
+    }
+
     uint64_t numCells() const {
         return _cells.size();
     }
-    
+
 };
 
 class OffsetAndTime
@@ -186,9 +203,9 @@ class SpaceMap {
   public:
     SpaceMap(float* space, const SpaceLayout& layout) : _space(space), _layout(layout) {
     }
-    
+
     SpaceCell spaceStart() {
-        std::vector<uint64_t> startIndex;
+        SpaceIndex startIndex;
         for (uint64_t i = 0; i < _layout.numDimensions(); ++i)
         {
             startIndex.push_back(0);
@@ -197,7 +214,7 @@ class SpaceMap {
     }
 
     SpaceCell spaceEnd() {
-        std::vector<uint64_t> startIndex;
+        SpaceIndex startIndex;
         for (uint64_t i = 0; i < _layout.numDimensions(); ++i)
         {
             startIndex.push_back(_layout.dimensionSize(i) -1);
@@ -205,14 +222,14 @@ class SpaceMap {
         return cell(startIndex);
     }
 
-    SpaceCell cell(const std::vector<uint64_t>& index) {
+    SpaceCell cell(const SpaceIndex& index) {
         return SpaceCell(index, _layout);
     }
 
     SpaceCell cell(uint64_t offset) {
         return SpaceCell(offset, _layout);
     }
-    
+
     uint64_t numCells() {
         return _layout.layoutSize();
     }
@@ -231,11 +248,25 @@ class SpaceMap {
         return timeResult;
     }
 
+    /***
+     * Builds a navigation path given a list of indexes
+     * @param indexes The indexes of the NavigationPath
+     * @return NavigationPath with all the cells built
+     */
+    NavigationPath navigationPath(std::vector<SpaceIndex> indexes)
+    {
+        NavigationPath res;
+        for (SpaceIndex index: indexes ) {
+            res.add(cell(index));
+        }
+        return res;
+    }
+
     NavigationPath fastestRoute(SpaceCell fromCell, SpaceCell targetCell) {
         std::vector<float> timeList(numCells(), std::numeric_limits<float>::max());
         std::vector<SpaceCell> previousCell(numCells(), SpaceCell::undefined() );
         std::priority_queue<OffsetAndTime, std::vector<OffsetAndTime>, offsetAndTimeComparator> priorityQueue;
-        
+
         priorityQueue.push(OffsetAndTime(fromCell.spaceOffset(), 0));
         timeList[fromCell.spaceOffset()] = 0;
         bool targetCellReached = false;
