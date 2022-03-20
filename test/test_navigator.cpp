@@ -100,10 +100,10 @@ TEST_CASE("test_fastest_route_in_3d_space")
 
 TEST_CASE("test_fastest_route_using_std_vector")
 {
-    std::vector<float> space={
+    std::vector<float> space = {
         0.F, 1.F, 3.F,
         5.F, 2.F, 8.F,
-        1.F, 5.F, 6.F };
+        1.F, 5.F, 6.F};
     SpaceMap map = SpaceMap(space.data(), SpaceLayout({3, 3}));
     NavigationPath navigationPath = map.fastestRoute(map.spaceStart(), map.spaceEnd());
     REQUIRE(navigationPath.numCells() == 5);
@@ -115,4 +115,4 @@ TEST_CASE("test version")
 {
     REQUIRE(HYPERSPACE_NAVIGATOR_VERSION_STRING == std::string("1.0.0"));
 }
-}//namespace hyperspace_navigator
+} // namespace hyperspace_navigator
