@@ -6,7 +6,7 @@ _“Any planet is 'Earth' to those that live on it.”_
 **― Isaac Asimov, Pebble in the Sky**
 
 
-![hyperspace-navigator-logo](https://github.com/jordiferm/hyperspace-navigator-stack1/blob/7711d6ba9691583ff6ca8c783e4ec480c2742b91/assets/logo.png)
+![hyperspace-navigator-logo](https://github.com/jordiferm/hyperspace-navigator-lib-cpp/blob/5a5dcf4433649cf5390f9d42ec7f439e52abf1ca/assets/logo.png)
 
 
 [![Build Status](https://travis-ci.com/<url_here>)](https://travis-ci.com/mapbox/hpp-skel)
@@ -147,7 +147,7 @@ And lastly, mathematically checking for a specific version:
 #endif
 ```
 
-#TODO
+# TODO
 * Describe why not used NDimension array libs like: 
   * https://www.cs.cornell.edu/~saeed/lite/html/group__array.html 
   * or Eigen: https://eigen.tuxfamily.org/index.php?title=Main_Page
