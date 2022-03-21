@@ -158,7 +158,7 @@ The reason why is that HyperSpace Navigator wants to show how to map a N-Dimensi
 
 ## Space representation
 We assume that the N-Dimensional space can be flat represented, like: 
-  * Assumed array layout in memory: https://eli.thegreenplace.net/2015/memory-layout-of-multi-dimensional-arrays
+  * Assumed array layout in memory in *column-major* like explained here: https://eli.thegreenplace.net/2015/memory-layout-of-multi-dimensional-arrays
 
 # Contributing and License
 
